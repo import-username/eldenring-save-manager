@@ -1,12 +1,14 @@
 {
     "compilerOptions": {
         "target": "es6",
-        "jsx": "react-jsx",
+        "jsx": "react",
         "module": "commonjs",
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
-        "skipLibCheck": true
+        "allowJs": true,
+        "skipLibCheck": true,
+        "outDir": "dist"
     },
     "include": ["src/**/*"]
 }

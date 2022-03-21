@@ -1,0 +1,31 @@
+.save-backup {
+    width: 90%;
+    max-width: 420px;
+    height: 100px;
+    background-color: rgb(51, 57, 59);;
+    margin: 10px 0;
+    cursor: pointer;
+    -webkit-user-select: none;     
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    transition: transform 150ms, opacity 200ms;
+    color: rgb(238, 238, 238);
+    box-sizing: border-box;
+    padding: 8px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.save-backup span {
+    margin: 0 1rem;
+}
+
+.save-backup:hover {
+    transform: scale(1.1);
+}
+
+.save-backup:active {
+    opacity: 0.8;
+}
