@@ -113,6 +113,24 @@ app.on("ready", () => {
         });
     });
 
+    ipcMain.handle("deleteSaveBackup", async (event, backupDir) => {
+        return new Promise((resolve, reject) => {
+            if (!backupDir || !fs.existsSync(path.join(backupsPath, backupDir))) {
+                reject(new Error("Invalid backup name."));
+            }
+
+            try {
+                const deletePath = path.join(backupsPath, backupDir);
+
+                fs.rmdirSync(deletePath, { recursive: true, force: true });
+    
+                resolve();
+            } catch (exc) {
+                reject(new Error("Failed to delete backup."));
+            }
+        });
+    });
+
     ipcMain.handle("getBackups", async (event) => {
         const saves = fs.readdirSync(backupsPath);
 
@@ -133,7 +151,7 @@ function copySaveDirectory(saveDirectory, destination) {
         throw new Error("Failed to provide save directory and destination paths.");
     }
 
-    if (files && files.length > 0) {
+    if (files && files.length > 0 && isValidSavesDirectory(saveDirectory)) {
         try {
             fse.copySync(saveDirectory, destination);
         } catch (exc) {
