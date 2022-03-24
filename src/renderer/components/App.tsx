@@ -4,11 +4,17 @@ import useNotificationContext from '../context/NotificationContext';
 import type { ContextValue } from '../context/NotificationContext';
 import "../css/App.css";
 import SaveBackup from './SaveBackup';
+import useSaveBackupContext, { ContextValue as BackupMenuContext, SaveBackup as ISaveBackup } from '../context/SaveBackupContext';
 
 function App() {
-    const [saves, setSaves]: [string[], React.SetStateAction<any>] = useState([]);
+    const [saves, setSaves]: [ISaveBackup[], React.SetStateAction<any>] = useState([]);
 
     const [savePath, setSavePath]: [string, React.SetStateAction<any>] = useState("...");
+
+    const {
+        saveBackupMenuComponent: SaveBackupMenu,
+        displaySaveBackupMenu
+    }: BackupMenuContext = useSaveBackupContext() as BackupMenuContext;
 
     const { overlay: NotificatonOverlay, display: displayNotification }: ContextValue = useNotificationContext() as ContextValue;
 
@@ -34,7 +40,7 @@ function App() {
 
     async function onManualBackupClick(): Promise<void> {
         try {
-            const manualBackup = await window.api.invoke("backupSaveManual", null);
+            await window.api.invoke("backupSaveManual", null);
     
             const backups = await window.api.invoke("getBackups", null);
 
@@ -44,7 +50,11 @@ function App() {
         }
     }
 
-    function addSaveBackup(save: any, overwrite?: boolean): void {
+    function onSaveBackupClick(save: ISaveBackup): void {
+        displaySaveBackupMenu(save);
+    }
+
+    function addSaveBackup(save: ISaveBackup | ISaveBackup[], overwrite?: boolean): void {
         if (Array.isArray(save)) {
             if (overwrite) {
                 setSaves(() => [...save]);
@@ -62,7 +72,8 @@ function App() {
 
     useEffect(() => {
         getSavePathData();
-        window.api.invoke("getBackups", null).then((backups) => {
+
+        window.api.invoke("getBackups", null).then((backups: ISaveBackup[]) => {
             addSaveBackup(backups, true);
         });
     }, []);
@@ -86,13 +97,17 @@ function App() {
             <NotificatonOverlay />
             <div className="save-backup-container">
                 {
-                    saves.map((save: any) => {
+                    saves.sort((current: ISaveBackup, prev: ISaveBackup): number => {
+                        return new Date(current.stats.birthtime).getTime() -
+                                new Date(prev.stats.birthtime).getTime()
+                    }).map((save: ISaveBackup) => {
                         return (
-                            <SaveBackup key={save.name} save={save} />
+                            <SaveBackup key={save.name} save={save} onClick={onSaveBackupClick.bind(null, save)}/>
                         );
                     })
                 }
             </div>
+            <SaveBackupMenu />
         </div>
     );
 }

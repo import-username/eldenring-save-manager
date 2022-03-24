@@ -3,8 +3,8 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    overflow-x: hidden;
     position: relative;
+    overflow: hidden;
 }
 
 .content-container {
@@ -87,6 +87,8 @@
     flex-direction: column;
     width: 100%;
     align-items: center;
+    overflow-x: hidden;
+    overflow-y: scroll;
 }
 
 @media all and (min-width: 510px) {

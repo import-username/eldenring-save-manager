@@ -3,6 +3,7 @@ html, body {
     padding: 0;
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 
 #root {
@@ -14,6 +15,7 @@ html, body {
     justify-content: center;
     align-items: center;
     font-family: Roboto;
+    overflow: hidden;
 }
 
 @font-face {
