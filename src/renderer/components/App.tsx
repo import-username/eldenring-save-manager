@@ -70,6 +70,14 @@ function App() {
         }
     }
 
+    function onSaveBackupDelete(name: string): void {
+        if (name) {
+            setSaves(() => saves.filter((save) => {
+                return save.name !== name;
+            }));
+        }
+    }
+
     useEffect(() => {
         getSavePathData();
 
@@ -107,7 +115,7 @@ function App() {
                     })
                 }
             </div>
-            <SaveBackupMenu />
+            <SaveBackupMenu onDelete={onSaveBackupDelete}/>
         </div>
     );
 }

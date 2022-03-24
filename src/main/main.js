@@ -116,17 +116,23 @@ app.on("ready", () => {
     ipcMain.handle("deleteSaveBackup", async (event, backupDir) => {
         return new Promise((resolve, reject) => {
             if (!backupDir || !fs.existsSync(path.join(backupsPath, backupDir))) {
-                reject(new Error("Invalid backup name."));
+                return reject(new Error("Invalid backup name."));
+            }
+
+            const saves = fs.readdirSync(backupsPath);
+
+            if (!saves.includes(backupDir)) {
+                return reject(new Error("Could not find a save backup with provided name."));
             }
 
             try {
                 const deletePath = path.join(backupsPath, backupDir);
 
-                fs.rmdirSync(deletePath, { recursive: true, force: true });
+                fs.rmSync(deletePath, { recursive: true });
     
-                resolve();
+                return resolve();
             } catch (exc) {
-                reject(new Error("Failed to delete backup."));
+                return reject(new Error("Failed to delete backup."));
             }
         });
     });
