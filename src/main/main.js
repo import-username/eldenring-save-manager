@@ -56,10 +56,10 @@ app.on("ready", () => {
         return new Promise((resolve, reject) => {
             jsonStorage.get("settings", (err, data) => {
                 if (err || !data || !data.savePath) {
-                    reject(new Error("Failed to read save path property from json data."));
+                    return reject(new Error("Failed to read save path property from json data."));
                 }
                 
-                resolve(data.savePath);
+                return resolve(data.savePath);
             });
         });
     });
@@ -84,7 +84,7 @@ app.on("ready", () => {
         return new Promise((resolve, reject) => {
             jsonStorage.get("settings", (err, data) => {
                 if (err || !data || !data.savePath) {
-                    reject(new Error("Failed to read save path property from json data."));
+                    return reject(new Error("Failed to read save path property from json data."));
                 }
                 
                 if (isValidSavesDirectory(data.savePath)) {
@@ -99,15 +99,15 @@ app.on("ready", () => {
                                 backupSavePath
                             );
     
-                            resolve(data.savePath);
+                            return resolve(data.savePath);
                         } catch (err) {
-                            reject(new Error("Failed to create backup."));
+                            return reject(new Error("Failed to create backup."));
                         }
                     } else {
-                        reject(new Error("Failed to create backup."));
+                        return reject(new Error("Failed to create backup."));
                     }
                 } else {
-                    reject(new Error("Selected directory does not contain .sl2 save files."));
+                    return reject(new Error("Selected directory does not contain .sl2 save files."));
                 }
             });
         });
@@ -119,12 +119,6 @@ app.on("ready", () => {
                 return reject(new Error("Invalid backup name."));
             }
 
-            const saves = fs.readdirSync(backupsPath);
-
-            if (!saves.includes(backupDir)) {
-                return reject(new Error("Could not find a save backup with provided name."));
-            }
-
             try {
                 const deletePath = path.join(backupsPath, backupDir);
 
@@ -134,6 +128,41 @@ app.on("ready", () => {
             } catch (exc) {
                 return reject(new Error("Failed to delete backup."));
             }
+        });
+    });
+
+    ipcMain.handle("applySaveBackup", async (event, backupName) => {
+        return new Promise((resolve, reject) => {
+            if (!backupName || !fs.existsSync(path.join(backupsPath, backupName))) {
+                return reject(new Error("Invalid backup name."));
+            }
+
+            jsonStorage.get("settings", (err, data) => {
+                if (err || !data || !data.savePath) {
+                    return reject(new Error("Failed to read save path property from json data."));
+                }
+
+                try {
+                    const saveBackupPath = path.join(backupsPath, backupName);
+    
+                    const saveDirectory = getDirectoryContainingSave(data.savePath);
+
+                    const saveBackups = fs.readdirSync(saveBackupPath);
+
+                    for (let save of saveBackups) {
+                        const backupFilePath = path.join(saveBackupPath, save);
+
+                        const destination = path.join(saveDirectory, save);
+
+                        fse.copySync(backupFilePath, destination);
+                    }
+
+                    return resolve();
+                } catch (exc) {
+                    console.log(exc)
+                    return reject(new Error("Failed to apply backup."));
+                }
+            });
         });
     });
 
@@ -159,7 +188,15 @@ function copySaveDirectory(saveDirectory, destination) {
 
     if (files && files.length > 0 && isValidSavesDirectory(saveDirectory)) {
         try {
-            fse.copySync(saveDirectory, destination);
+            for (let file of files) {
+                if (/.bak|.sl2/.test(file)) {
+                    const savePath = path.join(saveDirectory, file);
+
+                    const destinationPath = path.join(destination, file);
+
+                    fse.copySync(savePath, destinationPath);
+                }
+            }
         } catch (exc) {
             throw exc;
         }

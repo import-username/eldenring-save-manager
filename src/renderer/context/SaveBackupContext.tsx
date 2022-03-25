@@ -30,7 +30,7 @@ function SaveBackupMenu({ save, onExit, onDelete }: { save: SaveBackup | null, o
     }
 
     async function onDeleteBackupClick(): Promise<void> {
-        if (save != null) {
+        if (save !== null) {
             try {
                 await window.api.invoke("deleteSaveBackup", save.name);
 
@@ -38,6 +38,20 @@ function SaveBackupMenu({ save, onExit, onDelete }: { save: SaveBackup | null, o
                     onDelete(save.name);
                 }
     
+                onExit();
+            } catch (exc: any) {
+                const errorMessage: string = exc instanceof Error ? exc.message : "An error occured.";
+    
+                displayNotification("red", errorMessage, 4500);
+            }
+        }
+    }
+
+    async function onApplyBackupClick(): Promise<void> {
+        if (save !== null) {
+            try {
+                await window.api.invoke("applySaveBackup", save.name);
+
                 onExit();
             } catch (exc: any) {
                 const errorMessage: string = exc instanceof Error ? exc.message : "An error occured.";
@@ -56,6 +70,10 @@ function SaveBackupMenu({ save, onExit, onDelete }: { save: SaveBackup | null, o
                 <span className="save-backup-menu-title">
                     {`Save name: ${save && save.name}`}
                 </span>
+                <span className="save-backup-warning"><span>Warning:</span> Applying backup will permanently overwrite your current save.</span>
+                <button className="apply-backup-button" onClick={onApplyBackupClick}>
+                    <span>Apply Backup</span>
+                </button>
                 <button className="delete-backup-button" onClick={onDeleteBackupClick}>
                     <span>Delete</span>
                 </button>

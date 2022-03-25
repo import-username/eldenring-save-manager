@@ -1,6 +1,14 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
-const validChannels = ["setSavePath", "getSavePath", "displaySavePathDialog", "backupSaveManual", "getBackups", "deleteSaveBackup"];
+const validChannels = [
+    "getBackups",
+    "getSavePath",
+    "setSavePath",
+    "applySaveBackup",
+    "deleteSaveBackup",
+    "backupSaveManual",
+    "displaySavePathDialog"
+];
 
 contextBridge.exposeInMainWorld("api", {
     send: (channel, data) => {

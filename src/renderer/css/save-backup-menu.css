@@ -51,6 +51,34 @@
     height: 90%;
 }
 
+.save-backup-warning {
+    margin: 1rem 2rem;
+    text-align: center;
+    font-size: 0.7em;
+}
+
+.save-backup-warning span {
+    color: red;
+}
+
+.apply-backup-button {
+    background-color: rgb(137, 255, 137);
+    color: rgb(0, 163, 0);
+    font-weight: bold;
+    font-family: Roboto;
+    font-size: 1em;
+    min-height: 45px;
+    min-width: 140px;
+    border-radius: 5px;
+    border: 1px solid rgb(25, 161, 25);
+    cursor: pointer;
+    transition: color 150ms, background-color 150ms;
+}
+
+.apply-backup-button:hover {
+    background-color: rgb(100, 255, 100);
+}
+
 .delete-backup-button {
     background-color: rgb(255, 77, 77);
     color: white;
