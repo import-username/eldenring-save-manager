@@ -1,10 +1,10 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
-const isDev = require("electron-is-dev");
-const path = require("path");
 const jsonStorage = require("electron-json-storage");
-const fs = require("fs");
-const fse = require("fs-extra");
+const isDev = require("electron-is-dev");
 const { nanoid } = require("nanoid");
+const fse = require("fs-extra");
+const path = require("path");
+const fs = require("fs");
 
 const PORT = process.env.PORT || "3000";
 
@@ -25,7 +25,7 @@ const createWindow = () => {
         win.loadURL(`http://localhost:${PORT}`);
     } else {
         win.setMenu(null);
-        win.loadFile(path.join(__dirname, "..", "index.html"));
+        win.loadURL(`file://${__dirname}/index.html`);
     }
 }
 
